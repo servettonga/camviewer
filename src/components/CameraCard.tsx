@@ -112,8 +112,8 @@ export function CameraCard({ camera, onEdit, onDelete }: CameraCardProps) {
 
   return (
     <div ref={setNodeRef} style={style}>
-      <Card className="overflow-hidden border-border">
-        <div className="relative aspect-video bg-accent">
+      <Card className="overflow-hidden border-border bg-card shadow-md hover:shadow-lg transition-shadow duration-300 group">
+        <div className="relative aspect-video bg-muted/30">
           {camera.enabled && isStreamSupported && !hasError ? (
             camera.type === 'mjpeg' ? (
               <img
@@ -161,13 +161,13 @@ export function CameraCard({ camera, onEdit, onDelete }: CameraCardProps) {
           <button
             {...attributes}
             {...listeners}
-            className="absolute top-2 left-2 p-1.5 bg-background/80 rounded cursor-grab active:cursor-grabbing hover:bg-background/90 transition-colors"
+            className="absolute top-2 left-2 p-1.5 bg-background/80 backdrop-blur-sm rounded-md cursor-grab active:cursor-grabbing hover:bg-background/90 transition-all opacity-0 group-hover:opacity-100"
           >
             <GripVertical className="h-4 w-4 text-foreground" />
           </button>
 
           {/* Controls Overlay */}
-          <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-background/90 to-transparent">
+          <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-background/95 via-background/60 to-transparent">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-foreground truncate max-w-[60%]">
                 {camera.name}

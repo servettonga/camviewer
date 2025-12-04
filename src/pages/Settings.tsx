@@ -1,10 +1,10 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { useCameras } from '@/hooks/useCameras';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, Download, Upload, Copy, Check, AlertCircle, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Download, Upload, Copy, Check, AlertCircle, RotateCcw, Sun, Moon, Monitor } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
   AlertDialog,
@@ -17,14 +17,22 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { ThemeContext, Theme } from '@/App';
 
 const Settings = () => {
   const { cameras, exportConfig, importConfig, resetAll } = useCameras();
   const { toast } = useToast();
+  const { theme, setTheme } = useContext(ThemeContext);
   const [importText, setImportText] = useState('');
   const [copied, setCopied] = useState(false);
   const [importError, setImportError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const themeOptions: { value: Theme; label: string; icon: React.ReactNode }[] = [
+    { value: 'light', label: 'Light', icon: <Sun className="h-4 w-4" /> },
+    { value: 'dark', label: 'Dark', icon: <Moon className="h-4 w-4" /> },
+    { value: 'system', label: 'System', icon: <Monitor className="h-4 w-4" /> },
+  ];
 
   const handleExport = () => {
     const data = exportConfig();
@@ -107,19 +115,43 @@ const Settings = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card">
-        <div className="container mx-auto px-4 py-3 flex items-center gap-4">
+      <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-md">
+        <div className="container mx-auto px-4 py-4 flex items-center gap-4">
           <Link to="/">
             <Button variant="ghost" size="icon">
               <ArrowLeft className="h-4 w-4" />
             </Button>
           </Link>
-          <h1 className="text-xl font-semibold text-foreground">Settings</h1>
+          <h1 className="text-xl font-semibold text-foreground tracking-tight">Settings</h1>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-6 max-w-2xl space-y-6">
-        <Card>
+      <main className="container mx-auto px-4 py-8 max-w-2xl space-y-6">
+        <Card className="shadow-sm">
+          <CardHeader>
+            <CardTitle>Appearance</CardTitle>
+            <CardDescription>
+              Choose how CamView looks on your device.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex gap-2">
+              {themeOptions.map((option) => (
+                <Button
+                  key={option.value}
+                  variant={theme === option.value ? 'default' : 'outline'}
+                  className="flex-1"
+                  onClick={() => setTheme(option.value)}
+                >
+                  {option.icon}
+                  <span className="ml-2">{option.label}</span>
+                </Button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm">
           <CardHeader>
             <CardTitle>Export Configuration</CardTitle>
             <CardDescription>
@@ -144,7 +176,7 @@ const Settings = () => {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="shadow-sm">
           <CardHeader>
             <CardTitle>Import Configuration</CardTitle>
             <CardDescription>
@@ -227,7 +259,7 @@ const Settings = () => {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="shadow-sm">
           <CardHeader>
             <CardTitle>About</CardTitle>
           </CardHeader>
