@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import Hls from 'hls.js';
 import { Camera } from '@/types/camera';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { GripVertical, Settings, Trash2, RefreshCw, Play, Pause, AlertCircle, Video } from 'lucide-react';
 import {
@@ -23,6 +24,7 @@ export function CameraCard({ camera, onEdit, onDelete }: CameraCardProps) {
   const [hasError, setHasError] = useState(false);
   const [key, setKey] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const hlsRef = useRef<Hls | null>(null);
 
   const {
     attributes,
@@ -59,19 +61,58 @@ export function CameraCard({ camera, onEdit, onDelete }: CameraCardProps) {
     setHasError(true);
   };
 
+  // Setup HLS.js for HLS streams
   useEffect(() => {
-    if (videoRef.current && camera.enabled) {
-      videoRef.current.play().catch(() => {
-        // Autoplay may be blocked
-      });
+    const video = videoRef.current;
+    if (!video || !camera.enabled || hasError) return;
+
+    // Cleanup previous HLS instance
+    if (hlsRef.current) {
+      hlsRef.current.destroy();
+      hlsRef.current = null;
     }
-  }, [camera.enabled, key]);
+
+    if (camera.type === 'hls' && Hls.isSupported()) {
+      const hls = new Hls({
+        enableWorker: true,
+        lowLatencyMode: true,
+      });
+      hlsRef.current = hls;
+      
+      hls.loadSource(camera.url);
+      hls.attachMedia(video);
+      
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        video.play().catch(() => {});
+      });
+      
+      hls.on(Hls.Events.ERROR, (_, data) => {
+        if (data.fatal) {
+          setHasError(true);
+        }
+      });
+    } else if (camera.type === 'hls' && video.canPlayType('application/vnd.apple.mpegurl')) {
+      // Safari native HLS support
+      video.src = camera.url;
+      video.play().catch(() => {});
+    } else if (camera.type !== 'hls' && camera.type !== 'mjpeg') {
+      video.src = camera.url;
+      video.play().catch(() => {});
+    }
+
+    return () => {
+      if (hlsRef.current) {
+        hlsRef.current.destroy();
+        hlsRef.current = null;
+      }
+    };
+  }, [camera.url, camera.type, camera.enabled, key, hasError]);
 
   const isStreamSupported = camera.type !== 'rtsp';
 
   return (
     <div ref={setNodeRef} style={style}>
-      <Card className="overflow-hidden bg-card border-border">
+      <Card className="overflow-hidden border-border">
         <div className="relative aspect-video bg-accent">
           {camera.enabled && isStreamSupported && !hasError ? (
             camera.type === 'mjpeg' ? (
@@ -86,8 +127,7 @@ export function CameraCard({ camera, onEdit, onDelete }: CameraCardProps) {
               <video
                 key={key}
                 ref={videoRef}
-                src={camera.url}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover bg-black"
                 autoPlay
                 muted
                 playsInline

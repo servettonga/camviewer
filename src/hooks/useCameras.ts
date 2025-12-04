@@ -3,8 +3,43 @@ import { Camera, AppConfig } from '@/types/camera';
 
 const STORAGE_KEY = 'camview-config';
 
+const exampleCameras: Camera[] = [
+  {
+    id: 'example-1',
+    name: 'Big Buck Bunny (Demo)',
+    url: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
+    type: 'hls',
+    enabled: true,
+    order: 0,
+  },
+  {
+    id: 'example-2',
+    name: 'Sintel (Demo)',
+    url: 'https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8',
+    type: 'hls',
+    enabled: true,
+    order: 1,
+  },
+  {
+    id: 'example-3',
+    name: 'Test Pattern (Demo)',
+    url: 'https://cph-p2p-msl.akamaized.net/hls/live/2000341/test/master.m3u8',
+    type: 'hls',
+    enabled: true,
+    order: 2,
+  },
+  {
+    id: 'example-4',
+    name: 'Tears of Steel (Demo)',
+    url: 'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8',
+    type: 'hls',
+    enabled: true,
+    order: 3,
+  },
+];
+
 const defaultConfig: AppConfig = {
-  cameras: [],
+  cameras: exampleCameras,
   gridColumns: 2,
   autoRefreshInterval: 30,
 };
