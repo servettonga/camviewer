@@ -1,7 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Camera, AppConfig } from '@/types/camera';
-
-const STORAGE_KEY = 'camview-config';
+import { saveConfig, loadConfig, migrateFromLocalStorage } from '@/lib/storage';
 
 // Test streams to verify player works - replace with your own camera URLs
 const exampleCameras: Camera[] = [
@@ -40,26 +39,48 @@ const defaultConfig: AppConfig = {
 export function useCameras() {
   const [config, setConfig] = useState<AppConfig>(defaultConfig);
   const [isLoaded, setIsLoaded] = useState(false);
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Load from localStorage on mount
+  // Load from IndexedDB on mount
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        setConfig({ ...defaultConfig, ...parsed });
-      } catch (e) {
-        console.error('Failed to parse stored config:', e);
+    async function init() {
+      // Try to migrate from localStorage first
+      let stored = await migrateFromLocalStorage();
+      
+      // If no migration, try loading from IndexedDB
+      if (!stored) {
+        stored = await loadConfig();
       }
+      
+      if (stored) {
+        setConfig({ ...defaultConfig, ...stored });
+      }
+      setIsLoaded(true);
     }
-    setIsLoaded(true);
+    init();
   }, []);
 
-  // Save to localStorage on change
+  // Debounced save to IndexedDB on change
   useEffect(() => {
-    if (isLoaded) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+    if (!isLoaded) return;
+    
+    // Clear existing timeout
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
     }
+    
+    // Debounce saves by 500ms
+    saveTimeoutRef.current = setTimeout(() => {
+      saveConfig(config).catch(err => {
+        console.error('Failed to save config:', err);
+      });
+    }, 500);
+    
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
   }, [config, isLoaded]);
 
   const addCamera = useCallback((camera: Omit<Camera, 'id' | 'order'>) => {
@@ -101,7 +122,6 @@ export function useCameras() {
     setConfig(prev => ({ ...prev, gridColumns: columns }));
   }, []);
 
-
   const exportConfig = useCallback(() => {
     return JSON.stringify(config, null, 2);
   }, [config]);
@@ -126,9 +146,10 @@ export function useCameras() {
     }));
   }, []);
 
-  const resetAll = useCallback(() => {
-    localStorage.removeItem(STORAGE_KEY);
+  const resetAll = useCallback(async () => {
     setConfig(defaultConfig);
+    // Save immediately on reset
+    await saveConfig(defaultConfig);
   }, []);
 
   const sortedCameras = [...config.cameras].sort((a, b) => a.order - b.order);
