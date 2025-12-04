@@ -4,11 +4,22 @@ import { useCameras } from '@/hooks/useCameras';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, Download, Upload, Copy, Check, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Download, Upload, Copy, Check, AlertCircle, RotateCcw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 const Settings = () => {
-  const { cameras, exportConfig, importConfig } = useCameras();
+  const { cameras, exportConfig, importConfig, resetAll } = useCameras();
   const { toast } = useToast();
   const [importText, setImportText] = useState('');
   const [copied, setCopied] = useState(false);
@@ -84,6 +95,14 @@ const Settings = () => {
     };
     reader.readAsText(file);
     e.target.value = '';
+  };
+
+  const handleReset = () => {
+    resetAll();
+    toast({
+      title: 'Reset complete',
+      description: 'All settings have been restored to defaults with demo cameras.',
+    });
   };
 
   return (
@@ -172,6 +191,39 @@ const Settings = () => {
                 Import from Text
               </Button>
             </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-destructive/50">
+          <CardHeader>
+            <CardTitle>Reset Everything</CardTitle>
+            <CardDescription>
+              Clear all cameras and settings, then restore demo streams.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive">
+                  <RotateCcw className="h-4 w-4 mr-2" />
+                  Reset to Defaults
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Reset all settings?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will delete all your cameras and settings. Demo streams will be loaded. This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleReset}>
+                    Reset Everything
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </CardContent>
         </Card>
 
