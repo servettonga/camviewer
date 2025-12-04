@@ -152,6 +152,15 @@ export function useCameras() {
     await saveConfig(defaultConfig);
   }, []);
 
+  const toggleExpanded = useCallback((id: string) => {
+    setConfig(prev => ({
+      ...prev,
+      cameras: prev.cameras.map(c => 
+        c.id === id ? { ...c, expanded: !c.expanded } : c
+      ),
+    }));
+  }, []);
+
   const sortedCameras = [...config.cameras].sort((a, b) => a.order - b.order);
 
   return {
@@ -163,6 +172,7 @@ export function useCameras() {
     deleteCamera,
     reorderCameras,
     setGridColumns,
+    toggleExpanded,
     exportConfig,
     importConfig,
     loadExamples,

@@ -17,8 +17,8 @@ export default defineConfig(({ mode }) => ({
       registerType: "autoUpdate",
       includeAssets: ["favicon.ico", "pwa-192x192.png", "pwa-512x512.png"],
       manifest: {
-        name: "CamView - Camera Stream Viewer",
-        short_name: "CamView",
+        name: "CamViewer - Camera Stream Viewer",
+        short_name: "CamViewer",
         description: "Offline-capable camera stream viewer for local networks",
         theme_color: "#0f172a",
         background_color: "#0f172a",

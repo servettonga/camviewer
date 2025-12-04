@@ -1,73 +1,129 @@
-# Welcome to your Lovable project
+# CamViewer
 
-## Project info
+A lightweight, offline-capable camera stream viewer for monitoring security cameras, traffic feeds, and other video streams directly in your browser.
 
-**URL**: https://lovable.dev/projects/db44b644-eee2-4aad-9f2a-14bc59683baf
+## Features
 
-## How can I edit this code?
+- **Multiple Stream Types** - Supports HLS (.m3u8), HTTP video (MP4/WebM), and MJPEG streams
+- **Drag & Drop Reordering** - Organize your camera grid by dragging cards
+- **Expandable Cameras** - Expand any camera to 2x2 size for a larger view
+- **Fullscreen Mode** - View any stream in fullscreen
+- **Import/Export Config** - Backup and restore your camera setup as JSON
+- **Dark/Light/System Theme** - Choose your preferred appearance
+- **Offline Storage** - All configuration stored locally in IndexedDB
+- **No Backend Required** - Runs entirely in the browser, no server-side storage
 
-There are several ways of editing your application.
+## Supported Stream Types
 
-**Use Lovable**
+| Type  | Format      | Example URL                 |
+| ----- | ----------- | --------------------------- |
+| HLS   | `.m3u8`     | `http://server/stream.m3u8` |
+| HTTP  | MP4/WebM    | `http://server/video.mp4`   |
+| MJPEG | Motion JPEG | `http://camera/mjpeg`       |
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/db44b644-eee2-4aad-9f2a-14bc59683baf) and start prompting.
+### RTSP Cameras
 
-Changes made via Lovable will be committed automatically to this repo.
+Browsers cannot play RTSP streams directly. Use a media server to convert RTSP to HLS:
 
-**Use your preferred IDE**
+**Recommended: [go2rtc](https://github.com/AlexxIT/go2rtc)**
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+1. Install go2rtc on your local network
+2. Add your RTSP streams to go2rtc config
+3. Use the HLS URL in CamViewer:
+   ```
+   http://[go2rtc-ip]:1984/api/stream.m3u8?src=[stream-name]
+   ```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+Other options: MediaMTX, Frigate, or Scrypted.
 
-Follow these steps:
+## Running Locally
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### Prerequisites
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+- Node.js 18+ or Bun
 
-# Step 3: Install the necessary dependencies.
-npm i
+### Development Server
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```bash
+# Install dependencies
+npm install
+
+# Start development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The app will be available at `http://localhost:5173`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Production Build
 
-**Use GitHub Codespaces**
+```bash
+# Build for production
+npm run build
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+# Preview production build
+npm run preview
+```
 
-## What technologies are used for this project?
+## Docker
 
-This project is built with:
+### Using Pre-built Image
 
+```bash
+docker run -d -p 8080:80 your-registry/camviewer:latest
+```
+
+Access at `http://localhost:8080`
+
+### Building the Image
+
+```bash
+# Build the image
+docker build -t camviewer .
+
+# Run the container
+docker run -d -p 8080:80 camviewer
+```
+
+### Docker Compose
+
+```yaml
+version: '3.8'
+services:
+  camviewer:
+    build: .
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+```
+
+```bash
+docker-compose up -d
+```
+
+## Configuration
+
+All configuration is stored in your browser's IndexedDB. No server-side database is needed.
+
+### Export/Import
+
+1. Go to **Settings** → **Export Configuration** to download your setup
+2. Go to **Settings** → **Import Configuration** to restore from a JSON file
+
+### Grid Layout
+
+- Choose between 2 or 4 columns in Settings
+- Expanded cameras take 2x2 grid space
+
+## Tech Stack
+
+- React + TypeScript
 - Vite
-- TypeScript
-- React
-- shadcn-ui
 - Tailwind CSS
+- shadcn/ui
+- HLS.js for HLS playback
+- IndexedDB for local storage
+- Nginx (Docker container)
 
-## How can I deploy this project?
+## License
 
-Simply open [Lovable](https://lovable.dev/projects/db44b644-eee2-4aad-9f2a-14bc59683baf) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+MIT

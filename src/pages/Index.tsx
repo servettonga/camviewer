@@ -17,6 +17,7 @@ const Index = () => {
     deleteCamera,
     reorderCameras,
     setGridColumns,
+    toggleExpanded,
     loadExamples,
   } = useCameras();
 
@@ -62,6 +63,7 @@ const Index = () => {
               onReorder={reorderCameras}
               onEdit={handleEditCamera}
               onDelete={deleteCamera}
+              onToggleExpand={toggleExpanded}
             />
           </>
         ) : (

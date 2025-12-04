@@ -5,7 +5,7 @@ import Hls from 'hls.js';
 import { Camera } from '@/types/camera';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { GripVertical, Settings, Trash2, RefreshCw, Play, Pause, AlertCircle, Video } from 'lucide-react';
+import { GripVertical, Settings, Trash2, RefreshCw, Play, Pause, AlertCircle, Video, Maximize, Minimize2, Maximize2 } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,9 +17,10 @@ interface CameraCardProps {
   camera: Camera;
   onEdit: (camera: Camera) => void;
   onDelete: (id: string) => void;
+  onToggleExpand: (id: string) => void;
 }
 
-export function CameraCard({ camera, onEdit, onDelete }: CameraCardProps) {
+export function CameraCard({ camera, onEdit, onDelete, onToggleExpand }: CameraCardProps) {
   const [isPlaying, setIsPlaying] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [key, setKey] = useState(0);
@@ -59,6 +60,17 @@ export function CameraCard({ camera, onEdit, onDelete }: CameraCardProps) {
 
   const handleError = () => {
     setHasError(true);
+  };
+
+  const handleFullscreen = () => {
+    const container = videoRef.current?.parentElement;
+    if (container) {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      } else {
+        container.requestFullscreen();
+      }
+    }
   };
 
   // Setup HLS.js for HLS streams
@@ -194,6 +206,27 @@ export function CameraCard({ camera, onEdit, onDelete }: CameraCardProps) {
                       onClick={handleRefresh}
                     >
                       <RefreshCw className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={handleFullscreen}
+                    >
+                      <Maximize className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={() => onToggleExpand(camera.id)}
+                      title={camera.expanded ? "Collapse to 1x1" : "Expand to 2x2"}
+                    >
+                      {camera.expanded ? (
+                        <Minimize2 className="h-3.5 w-3.5" />
+                      ) : (
+                        <Maximize2 className="h-3.5 w-3.5" />
+                      )}
                     </Button>
                   </>
                 )}

@@ -22,6 +22,7 @@ interface CameraGridProps {
   onReorder: (cameras: Camera[]) => void;
   onEdit: (camera: Camera) => void;
   onDelete: (id: string) => void;
+  onToggleExpand: (id: string) => void;
 }
 
 export function CameraGrid({
@@ -30,6 +31,7 @@ export function CameraGrid({
   onReorder,
   onEdit,
   onDelete,
+  onToggleExpand,
 }: CameraGridProps) {
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -54,11 +56,9 @@ export function CameraGrid({
   };
 
   const gridClass = {
-    1: 'grid-cols-1',
-    2: 'grid-cols-1 sm:grid-cols-2',
-    3: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
-    4: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
-  }[gridColumns] || 'grid-cols-1 sm:grid-cols-2';
+    2: 'grid-cols-2',
+    4: 'grid-cols-2 lg:grid-cols-4',
+  }[gridColumns] || 'grid-cols-2';
 
   return (
     <DndContext
@@ -69,12 +69,17 @@ export function CameraGrid({
       <SortableContext items={cameras.map((c) => c.id)} strategy={rectSortingStrategy}>
         <div className={`grid ${gridClass} gap-4`}>
           {cameras.map((camera) => (
-            <CameraCard
+            <div
               key={camera.id}
-              camera={camera}
-              onEdit={onEdit}
-              onDelete={onDelete}
-            />
+              className={camera.expanded ? 'col-span-2 row-span-2' : ''}
+            >
+              <CameraCard
+                camera={camera}
+                onEdit={onEdit}
+                onDelete={onDelete}
+                onToggleExpand={onToggleExpand}
+              />
+            </div>
           ))}
         </div>
       </SortableContext>

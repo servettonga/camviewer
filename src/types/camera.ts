@@ -5,6 +5,7 @@ export interface Camera {
   type: 'http' | 'hls' | 'mjpeg' | 'other';
   enabled: boolean;
   order: number;
+  expanded?: boolean;
 }
 
 export interface AppConfig {
