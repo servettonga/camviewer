@@ -19,7 +19,6 @@ import { CameraCard } from './CameraCard';
 interface CameraGridProps {
   cameras: Camera[];
   gridColumns: number;
-  rtspProxyUrl?: string;
   onReorder: (cameras: Camera[]) => void;
   onEdit: (camera: Camera) => void;
   onDelete: (id: string) => void;
@@ -28,7 +27,6 @@ interface CameraGridProps {
 export function CameraGrid({
   cameras,
   gridColumns,
-  rtspProxyUrl,
   onReorder,
   onEdit,
   onDelete,
@@ -74,7 +72,6 @@ export function CameraGrid({
             <CameraCard
               key={camera.id}
               camera={camera}
-              rtspProxyUrl={rtspProxyUrl}
               onEdit={onEdit}
               onDelete={onDelete}
             />

@@ -109,9 +109,6 @@ export function useCameras() {
     setConfig(prev => ({ ...prev, gridColumns: columns }));
   }, []);
 
-  const setRtspProxyUrl = useCallback((url: string) => {
-    setConfig(prev => ({ ...prev, rtspProxyUrl: url || undefined }));
-  }, []);
 
   const exportConfig = useCallback(() => {
     return JSON.stringify(config, null, 2);
@@ -147,14 +144,12 @@ export function useCameras() {
   return {
     cameras: sortedCameras,
     gridColumns: config.gridColumns,
-    rtspProxyUrl: config.rtspProxyUrl,
     isLoaded,
     addCamera,
     updateCamera,
     deleteCamera,
     reorderCameras,
     setGridColumns,
-    setRtspProxyUrl,
     exportConfig,
     importConfig,
     loadExamples,
