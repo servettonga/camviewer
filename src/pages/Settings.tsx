@@ -288,6 +288,33 @@ const Settings = () => {
 
         <Card className="shadow-sm">
           <CardHeader>
+            <CardTitle>RTSP Streams</CardTitle>
+            <CardDescription>
+              How to view RTSP camera streams in CamView.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="text-sm text-muted-foreground space-y-3">
+            <p>
+              Browsers cannot play RTSP streams directly. You need a media server to convert RTSP to HLS or WebRTC.
+            </p>
+            <div>
+              <p className="font-medium text-foreground mb-1">Recommended: go2rtc</p>
+              <ol className="list-decimal list-inside space-y-1 ml-2">
+                <li>Install <a href="https://github.com/AlexxIT/go2rtc" target="_blank" rel="noopener" className="text-primary hover:underline">go2rtc</a> on your local network</li>
+                <li>Add your RTSP streams to go2rtc config</li>
+                <li>Use the HLS URL in CamView:<br />
+                  <code className="text-xs bg-muted px-1.5 py-0.5 rounded">http://[go2rtc-ip]:1984/api/stream.m3u8?src=[stream-name]</code>
+                </li>
+              </ol>
+            </div>
+            <p className="text-xs">
+              Other options: MediaMTX, Frigate, or Scrypted can also convert RTSP to web formats.
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm">
+          <CardHeader>
             <CardTitle>About</CardTitle>
           </CardHeader>
           <CardContent className="text-sm text-muted-foreground space-y-2">
@@ -295,7 +322,7 @@ const Settings = () => {
               <strong>CamView</strong> is a simple camera stream viewer that stores all configuration locally in your browser.
             </p>
             <p>
-              <strong>Supported stream types:</strong> HTTP video (MP4/WebM), HLS (.m3u8), MJPEG. RTSP streams require a media server like MediaMTX to convert to web-compatible formats.
+              <strong>Supported stream types:</strong> HTTP video (MP4/WebM), HLS (.m3u8), MJPEG.
             </p>
             <p>
               All data is stored locally and never leaves your device.

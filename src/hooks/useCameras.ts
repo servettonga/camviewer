@@ -23,19 +23,11 @@ const exampleCameras: Camera[] = [
   },
   {
     id: 'example-3',
-    name: 'Test Stream 3 (Akamai Live)',
-    url: 'https://cph-p2p-msl.akamaized.net/hls/live/2000341/test/master.m3u8',
-    type: 'hls',
-    enabled: true,
-    order: 2,
-  },
-  {
-    id: 'example-4',
-    name: 'Test Stream 4 (Tears of Steel)',
+    name: 'Test Stream 3 (Tears of Steel)',
     url: 'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8',
     type: 'hls',
     enabled: true,
-    order: 3,
+    order: 2,
   },
 ];
 
