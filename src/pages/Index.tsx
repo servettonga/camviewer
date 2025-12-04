@@ -18,6 +18,7 @@ const Index = () => {
   const {
     cameras,
     gridColumns,
+    rtspProxyUrl,
     isLoaded,
     addCamera,
     updateCamera,
@@ -88,6 +89,7 @@ const Index = () => {
             <CameraGrid
               cameras={cameras}
               gridColumns={gridColumns}
+              rtspProxyUrl={rtspProxyUrl}
               onReorder={reorderCameras}
               onEdit={handleEditCamera}
               onDelete={deleteCamera}

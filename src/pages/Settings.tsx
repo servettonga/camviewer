@@ -1,10 +1,11 @@
-import { useState, useRef, useContext } from 'react';
+import { useState, useRef, useContext, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useCameras } from '@/hooks/useCameras';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, Download, Upload, Copy, Check, AlertCircle, RotateCcw, Sun, Moon, Monitor } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { ArrowLeft, Download, Upload, Copy, Check, AlertCircle, RotateCcw, Sun, Moon, Monitor, Server } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
   AlertDialog,
@@ -20,13 +21,19 @@ import {
 import { ThemeContext, Theme } from '@/App';
 
 const Settings = () => {
-  const { cameras, exportConfig, importConfig, resetAll } = useCameras();
+  const { cameras, rtspProxyUrl, exportConfig, importConfig, resetAll, setRtspProxyUrl } = useCameras();
   const { toast } = useToast();
   const { theme, setTheme } = useContext(ThemeContext);
   const [importText, setImportText] = useState('');
   const [copied, setCopied] = useState(false);
   const [importError, setImportError] = useState('');
+  const [proxyInput, setProxyInput] = useState(rtspProxyUrl || '');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Sync proxy input when loaded from storage
+  useEffect(() => {
+    setProxyInput(rtspProxyUrl || '');
+  }, [rtspProxyUrl]);
 
   const themeOptions: { value: Theme; label: string; icon: React.ReactNode }[] = [
     { value: 'light', label: 'Light', icon: <Sun className="h-4 w-4" /> },
@@ -148,6 +155,42 @@ const Settings = () => {
                 </Button>
               ))}
             </div>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Server className="h-5 w-5" />
+              RTSP Proxy
+            </CardTitle>
+            <CardDescription>
+              Configure a go2rtc or similar proxy server to convert RTSP streams to browser-compatible HLS format.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Input
+                value={proxyInput}
+                onChange={(e) => setProxyInput(e.target.value)}
+                placeholder="http://192.168.1.100:1984"
+              />
+              <p className="text-xs text-muted-foreground">
+                RTSP URLs like <code className="bg-muted px-1 rounded">rtsp://ip:port/stream</code> will be converted to{' '}
+                <code className="bg-muted px-1 rounded">[proxy]/api/stream.m3u8?src=[encoded-url]</code>
+              </p>
+            </div>
+            <Button 
+              onClick={() => {
+                setRtspProxyUrl(proxyInput);
+                toast({
+                  title: proxyInput ? 'Proxy configured' : 'Proxy removed',
+                  description: proxyInput ? 'RTSP streams will now use the proxy.' : 'RTSP proxy has been disabled.',
+                });
+              }}
+            >
+              Save Proxy URL
+            </Button>
           </CardContent>
         </Card>
 

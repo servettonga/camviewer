@@ -3,35 +3,36 @@ import { Camera, AppConfig } from '@/types/camera';
 
 const STORAGE_KEY = 'camview-config';
 
+// Test streams to verify player works - replace with your own camera URLs
 const exampleCameras: Camera[] = [
   {
     id: 'example-1',
-    name: 'Jackson Hole Town Square',
-    url: 'https://video.nest.com/live/g8fWJfwLSH',
-    type: 'http',
+    name: 'Test Stream 1 (Big Buck Bunny)',
+    url: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
+    type: 'hls',
     enabled: true,
     order: 0,
   },
   {
     id: 'example-2',
-    name: 'Abbey Road Crossing (London)',
-    url: 'https://videos-3.earthcam.com/fecnetwork/AbbseyRoadHD1.flv/chunklist_w1421640637.m3u8',
+    name: 'Test Stream 2 (ARTE)',
+    url: 'https://test-streams.mux.dev/test_001/stream.m3u8',
     type: 'hls',
     enabled: true,
     order: 1,
   },
   {
     id: 'example-3',
-    name: 'Times Square NYC',
-    url: 'https://videos-3.earthcam.com/fecnetwork/15444.flv/chunklist_w1552498498.m3u8',
+    name: 'Test Stream 3 (Akamai Live)',
+    url: 'https://cph-p2p-msl.akamaized.net/hls/live/2000341/test/master.m3u8',
     type: 'hls',
     enabled: true,
     order: 2,
   },
   {
     id: 'example-4',
-    name: 'Demo: Traffic Cam Style',
-    url: 'https://cph-p2p-msl.akamaized.net/hls/live/2000341/test/master.m3u8',
+    name: 'Test Stream 4 (Tears of Steel)',
+    url: 'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8',
     type: 'hls',
     enabled: true,
     order: 3,
@@ -108,6 +109,10 @@ export function useCameras() {
     setConfig(prev => ({ ...prev, gridColumns: columns }));
   }, []);
 
+  const setRtspProxyUrl = useCallback((url: string) => {
+    setConfig(prev => ({ ...prev, rtspProxyUrl: url || undefined }));
+  }, []);
+
   const exportConfig = useCallback(() => {
     return JSON.stringify(config, null, 2);
   }, [config]);
@@ -142,12 +147,14 @@ export function useCameras() {
   return {
     cameras: sortedCameras,
     gridColumns: config.gridColumns,
+    rtspProxyUrl: config.rtspProxyUrl,
     isLoaded,
     addCamera,
     updateCamera,
     deleteCamera,
     reorderCameras,
     setGridColumns,
+    setRtspProxyUrl,
     exportConfig,
     importConfig,
     loadExamples,

@@ -15,16 +15,28 @@ import {
 
 interface CameraCardProps {
   camera: Camera;
+  rtspProxyUrl?: string;
   onEdit: (camera: Camera) => void;
   onDelete: (id: string) => void;
 }
 
-export function CameraCard({ camera, onEdit, onDelete }: CameraCardProps) {
+export function CameraCard({ camera, rtspProxyUrl, onEdit, onDelete }: CameraCardProps) {
   const [isPlaying, setIsPlaying] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [key, setKey] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
+
+  // Convert RTSP URL to proxied HLS URL if proxy is configured
+  const getStreamUrl = () => {
+    if (camera.type === 'rtsp' && rtspProxyUrl) {
+      return `${rtspProxyUrl}/api/stream.m3u8?src=${encodeURIComponent(camera.url)}`;
+    }
+    return camera.url;
+  };
+
+  const streamUrl = getStreamUrl();
+  const isRtspWithProxy = camera.type === 'rtsp' && rtspProxyUrl;
 
   const {
     attributes,
@@ -61,7 +73,7 @@ export function CameraCard({ camera, onEdit, onDelete }: CameraCardProps) {
     setHasError(true);
   };
 
-  // Setup HLS.js for HLS streams
+  // Setup HLS.js for HLS streams (and proxied RTSP)
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !camera.enabled || hasError) return;
@@ -72,14 +84,16 @@ export function CameraCard({ camera, onEdit, onDelete }: CameraCardProps) {
       hlsRef.current = null;
     }
 
-    if (camera.type === 'hls' && Hls.isSupported()) {
+    const useHls = camera.type === 'hls' || isRtspWithProxy;
+
+    if (useHls && Hls.isSupported()) {
       const hls = new Hls({
         enableWorker: true,
         lowLatencyMode: true,
       });
       hlsRef.current = hls;
       
-      hls.loadSource(camera.url);
+      hls.loadSource(streamUrl);
       hls.attachMedia(video);
       
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
@@ -91,12 +105,12 @@ export function CameraCard({ camera, onEdit, onDelete }: CameraCardProps) {
           setHasError(true);
         }
       });
-    } else if (camera.type === 'hls' && video.canPlayType('application/vnd.apple.mpegurl')) {
+    } else if (useHls && video.canPlayType('application/vnd.apple.mpegurl')) {
       // Safari native HLS support
-      video.src = camera.url;
+      video.src = streamUrl;
       video.play().catch(() => {});
-    } else if (camera.type !== 'hls' && camera.type !== 'mjpeg') {
-      video.src = camera.url;
+    } else if (!useHls && camera.type !== 'mjpeg') {
+      video.src = streamUrl;
       video.play().catch(() => {});
     }
 
@@ -106,9 +120,9 @@ export function CameraCard({ camera, onEdit, onDelete }: CameraCardProps) {
         hlsRef.current = null;
       }
     };
-  }, [camera.url, camera.type, camera.enabled, key, hasError]);
+  }, [streamUrl, camera.type, camera.enabled, key, hasError, isRtspWithProxy]);
 
-  const isStreamSupported = camera.type !== 'rtsp';
+  const isStreamSupported = camera.type !== 'rtsp' || isRtspWithProxy;
 
   return (
     <div ref={setNodeRef} style={style}>
@@ -118,7 +132,7 @@ export function CameraCard({ camera, onEdit, onDelete }: CameraCardProps) {
             camera.type === 'mjpeg' ? (
               <img
                 key={key}
-                src={camera.url}
+                src={streamUrl}
                 alt={camera.name}
                 className="w-full h-full object-cover"
                 onError={handleError}
@@ -145,7 +159,7 @@ export function CameraCard({ camera, onEdit, onDelete }: CameraCardProps) {
                 <>
                   <Video className="h-8 w-8" />
                   <span className="text-sm text-center px-4">
-                    RTSP requires a media server proxy
+                    Configure RTSP proxy in Settings
                   </span>
                 </>
               ) : (
