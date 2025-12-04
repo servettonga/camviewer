@@ -3,6 +3,7 @@ import { Camera } from '@/types/camera';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogFooter,
@@ -66,6 +67,9 @@ export function CameraDialog({ open, onOpenChange, camera, onSave }: CameraDialo
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{camera ? 'Edit Camera' : 'Add Camera'}</DialogTitle>
+          <DialogDescription>
+            {camera ? 'Update the camera stream settings.' : 'Add a new camera stream to your dashboard.'}
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
