@@ -6,31 +6,31 @@ const STORAGE_KEY = 'camview-config';
 const exampleCameras: Camera[] = [
   {
     id: 'example-1',
-    name: 'Big Buck Bunny (Demo)',
-    url: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
-    type: 'hls',
+    name: 'Jackson Hole Town Square',
+    url: 'https://video.nest.com/live/g8fWJfwLSH',
+    type: 'http',
     enabled: true,
     order: 0,
   },
   {
     id: 'example-2',
-    name: 'Apple HLS Test (Demo)',
-    url: 'https://devstreaming-cdn.apple.com/videos/streaming/examples/img_bipbop_adv_example_fmp4/master.m3u8',
+    name: 'Abbey Road Crossing (London)',
+    url: 'https://videos-3.earthcam.com/fecnetwork/AbbseyRoadHD1.flv/chunklist_w1421640637.m3u8',
     type: 'hls',
     enabled: true,
     order: 1,
   },
   {
     id: 'example-3',
-    name: 'Elephants Dream (Demo)',
-    url: 'https://test-streams.mux.dev/pts_shift/master.m3u8',
+    name: 'Times Square NYC',
+    url: 'https://videos-3.earthcam.com/fecnetwork/15444.flv/chunklist_w1552498498.m3u8',
     type: 'hls',
     enabled: true,
     order: 2,
   },
   {
     id: 'example-4',
-    name: 'Live Test Stream (Demo)',
+    name: 'Demo: Traffic Cam Style',
     url: 'https://cph-p2p-msl.akamaized.net/hls/live/2000341/test/master.m3u8',
     type: 'hls',
     enabled: true,
@@ -132,6 +132,11 @@ export function useCameras() {
     }));
   }, []);
 
+  const resetAll = useCallback(() => {
+    localStorage.removeItem(STORAGE_KEY);
+    setConfig(defaultConfig);
+  }, []);
+
   const sortedCameras = [...config.cameras].sort((a, b) => a.order - b.order);
 
   return {
@@ -146,5 +151,6 @@ export function useCameras() {
     exportConfig,
     importConfig,
     loadExamples,
+    resetAll,
   };
 }
