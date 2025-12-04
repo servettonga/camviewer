@@ -4,7 +4,6 @@ import { useCameras } from '@/hooks/useCameras';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
 import { ArrowLeft, Download, Upload, Copy, Check, AlertCircle, RotateCcw, Sun, Moon, Monitor } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -18,10 +17,17 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { ThemeContext, Theme } from '@/App';
 
 const Settings = () => {
-  const { cameras, exportConfig, importConfig, resetAll } = useCameras();
+  const { cameras, gridColumns, setGridColumns, exportConfig, importConfig, resetAll } = useCameras();
   const { toast } = useToast();
   const { theme, setTheme } = useContext(ThemeContext);
   const [importText, setImportText] = useState('');
@@ -135,19 +141,39 @@ const Settings = () => {
               Choose how CamView looks on your device.
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="flex gap-2">
-              {themeOptions.map((option) => (
-                <Button
-                  key={option.value}
-                  variant={theme === option.value ? 'default' : 'outline'}
-                  className="flex-1"
-                  onClick={() => setTheme(option.value)}
-                >
-                  {option.icon}
-                  <span className="ml-2">{option.label}</span>
-                </Button>
-              ))}
+          <CardContent className="space-y-4">
+            <div>
+              <p className="text-sm text-muted-foreground mb-2">Theme</p>
+              <div className="flex gap-2">
+                {themeOptions.map((option) => (
+                  <Button
+                    key={option.value}
+                    variant={theme === option.value ? 'default' : 'outline'}
+                    className="flex-1"
+                    onClick={() => setTheme(option.value)}
+                  >
+                    {option.icon}
+                    <span className="ml-2">{option.label}</span>
+                  </Button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground mb-2">Grid columns</p>
+              <Select
+                value={String(gridColumns)}
+                onValueChange={(v) => setGridColumns(Number(v))}
+              >
+                <SelectTrigger className="w-24">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">1</SelectItem>
+                  <SelectItem value="2">2</SelectItem>
+                  <SelectItem value="3">3</SelectItem>
+                  <SelectItem value="4">4</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </CardContent>
         </Card>

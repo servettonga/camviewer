@@ -6,13 +6,6 @@ import { CameraGrid } from '@/components/CameraGrid';
 import { CameraDialog } from '@/components/CameraDialog';
 import { Video, Plus, PlayCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 
 const Index = () => {
   const {
@@ -63,28 +56,6 @@ const Index = () => {
       <main className="container mx-auto px-4 py-6">
         {cameras.length > 0 ? (
           <>
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-sm text-muted-foreground">
-                {cameras.length} camera{cameras.length !== 1 ? 's' : ''} • Drag to reorder
-              </p>
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">Grid:</span>
-                <Select
-                  value={String(gridColumns)}
-                  onValueChange={(v) => setGridColumns(Number(v))}
-                >
-                  <SelectTrigger className="w-20">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1">1</SelectItem>
-                    <SelectItem value="2">2</SelectItem>
-                    <SelectItem value="3">3</SelectItem>
-                    <SelectItem value="4">4</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
             <CameraGrid
               cameras={cameras}
               gridColumns={gridColumns}

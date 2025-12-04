@@ -178,7 +178,7 @@ export function CameraCard({ camera, onEdit, onDelete }: CameraCardProps) {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-7 w-7"
+                      className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
                       onClick={handleTogglePlay}
                     >
                       {isPlaying ? (
@@ -190,7 +190,7 @@ export function CameraCard({ camera, onEdit, onDelete }: CameraCardProps) {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-7 w-7"
+                      className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
                       onClick={handleRefresh}
                     >
                       <RefreshCw className="h-3.5 w-3.5" />
@@ -199,7 +199,7 @@ export function CameraCard({ camera, onEdit, onDelete }: CameraCardProps) {
                 )}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-7 w-7">
+                    <Button variant="ghost" size="icon" className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity">
                       <Settings className="h-3.5 w-3.5" />
                     </Button>
                   </DropdownMenuTrigger>

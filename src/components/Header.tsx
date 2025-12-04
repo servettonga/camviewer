@@ -9,20 +9,17 @@ interface HeaderProps {
 export function Header({ onAddCamera }: HeaderProps) {
   return (
     <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-md">
-      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-3 group">
-          <div className="p-2 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
-            <Video className="h-5 w-5 text-primary" />
-          </div>
-          <h1 className="text-xl font-semibold text-foreground tracking-tight">CamView</h1>
+      <div className="container mx-auto px-4 py-2 flex items-center justify-between">
+        <Link to="/" className="flex items-center gap-2 group">
+          <Video className="h-5 w-5 text-primary" />
+          <span className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">CamView</span>
         </Link>
-        <div className="flex items-center gap-3">
-          <Button onClick={onAddCamera} size="sm" className="shadow-sm">
-            <Plus className="h-4 w-4 mr-1.5" />
-            Add Camera
+        <div className="flex items-center gap-1">
+          <Button onClick={onAddCamera} variant="ghost" size="icon" className="h-8 w-8">
+            <Plus className="h-4 w-4" />
           </Button>
           <Link to="/settings">
-            <Button variant="outline" size="icon" className="shadow-sm">
+            <Button variant="ghost" size="icon" className="h-8 w-8">
               <Settings className="h-4 w-4" />
             </Button>
           </Link>
