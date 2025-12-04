@@ -1,0 +1,199 @@
+import { useState, useRef } from 'react';
+import { Link } from 'react-router-dom';
+import { useCameras } from '@/hooks/useCameras';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Textarea } from '@/components/ui/textarea';
+import { ArrowLeft, Download, Upload, Copy, Check, AlertCircle } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+
+const Settings = () => {
+  const { cameras, exportConfig, importConfig } = useCameras();
+  const { toast } = useToast();
+  const [importText, setImportText] = useState('');
+  const [copied, setCopied] = useState(false);
+  const [importError, setImportError] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleExport = () => {
+    const data = exportConfig();
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `camview-config-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast({
+      title: 'Configuration exported',
+      description: 'Your camera configuration has been downloaded.',
+    });
+  };
+
+  const handleCopyToClipboard = async () => {
+    const data = exportConfig();
+    await navigator.clipboard.writeText(data);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+    toast({
+      title: 'Copied to clipboard',
+      description: 'Configuration JSON has been copied.',
+    });
+  };
+
+  const handleImportFromText = () => {
+    setImportError('');
+    if (!importText.trim()) {
+      setImportError('Please paste a configuration JSON');
+      return;
+    }
+    const success = importConfig(importText);
+    if (success) {
+      setImportText('');
+      toast({
+        title: 'Configuration imported',
+        description: 'Your cameras have been updated.',
+      });
+    } else {
+      setImportError('Invalid configuration format. Please check the JSON.');
+    }
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const content = event.target?.result as string;
+      const success = importConfig(content);
+      if (success) {
+        toast({
+          title: 'Configuration imported',
+          description: `Loaded configuration from ${file.name}`,
+        });
+      } else {
+        toast({
+          title: 'Import failed',
+          description: 'Invalid configuration file format.',
+          variant: 'destructive',
+        });
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      <header className="border-b border-border bg-card">
+        <div className="container mx-auto px-4 py-3 flex items-center gap-4">
+          <Link to="/">
+            <Button variant="ghost" size="icon">
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+          </Link>
+          <h1 className="text-xl font-semibold text-foreground">Settings</h1>
+        </div>
+      </header>
+
+      <main className="container mx-auto px-4 py-6 max-w-2xl space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Export Configuration</CardTitle>
+            <CardDescription>
+              Download your current configuration with {cameras.length} camera{cameras.length !== 1 ? 's' : ''} as a JSON file.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex flex-wrap gap-2">
+              <Button onClick={handleExport}>
+                <Download className="h-4 w-4 mr-2" />
+                Download JSON
+              </Button>
+              <Button variant="outline" onClick={handleCopyToClipboard}>
+                {copied ? (
+                  <Check className="h-4 w-4 mr-2" />
+                ) : (
+                  <Copy className="h-4 w-4 mr-2" />
+                )}
+                {copied ? 'Copied!' : 'Copy to Clipboard'}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Import Configuration</CardTitle>
+            <CardDescription>
+              Upload a JSON file or paste configuration to restore your cameras.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileUpload}
+                accept=".json"
+                className="hidden"
+              />
+              <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
+                <Upload className="h-4 w-4 mr-2" />
+                Upload JSON File
+              </Button>
+            </div>
+            
+            <div className="relative">
+              <p className="text-sm text-muted-foreground mb-2">Or paste JSON configuration:</p>
+              <Textarea
+                value={importText}
+                onChange={(e) => {
+                  setImportText(e.target.value);
+                  setImportError('');
+                }}
+                placeholder='{"cameras": [...], "gridColumns": 2}'
+                className="min-h-[150px] font-mono text-sm"
+              />
+              {importError && (
+                <div className="flex items-center gap-2 mt-2 text-sm text-destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  {importError}
+                </div>
+              )}
+              <Button
+                className="mt-2"
+                onClick={handleImportFromText}
+                disabled={!importText.trim()}
+              >
+                Import from Text
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>About</CardTitle>
+          </CardHeader>
+          <CardContent className="text-sm text-muted-foreground space-y-2">
+            <p>
+              <strong>CamView</strong> is a simple camera stream viewer that stores all configuration locally in your browser.
+            </p>
+            <p>
+              <strong>Supported stream types:</strong> HTTP video (MP4/WebM), HLS (.m3u8), MJPEG. RTSP streams require a media server like MediaMTX to convert to web-compatible formats.
+            </p>
+            <p>
+              All data is stored locally and never leaves your device.
+            </p>
+          </CardContent>
+        </Card>
+      </main>
+    </div>
+  );
+};
+
+export default Settings;
