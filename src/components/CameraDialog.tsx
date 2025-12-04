@@ -109,15 +109,9 @@ export function CameraDialog({ open, onOpenChange, camera, onSave }: CameraDialo
                 <SelectItem value="http">HTTP (MP4/WebM)</SelectItem>
                 <SelectItem value="hls">HLS (.m3u8)</SelectItem>
                 <SelectItem value="mjpeg">MJPEG</SelectItem>
-                <SelectItem value="rtsp">RTSP (requires proxy)</SelectItem>
                 <SelectItem value="other">Other</SelectItem>
               </SelectContent>
             </Select>
-            {formData.type === 'rtsp' && (
-              <p className="text-sm text-muted-foreground">
-                RTSP streams require a media server (like MediaMTX) to convert to HLS/HTTP.
-              </p>
-            )}
           </div>
 
           <div className="flex items-center justify-between">

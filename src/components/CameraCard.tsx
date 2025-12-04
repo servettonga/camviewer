@@ -95,7 +95,7 @@ export function CameraCard({ camera, onEdit, onDelete }: CameraCardProps) {
       // Safari native HLS support
       video.src = camera.url;
       video.play().catch(() => {});
-    } else if (camera.type !== 'mjpeg' && camera.type !== 'rtsp') {
+    } else if (camera.type !== 'mjpeg') {
       video.src = camera.url;
       video.play().catch(() => {});
     }
@@ -108,7 +108,7 @@ export function CameraCard({ camera, onEdit, onDelete }: CameraCardProps) {
     };
   }, [camera.url, camera.type, camera.enabled, key, hasError]);
 
-  const isStreamSupported = camera.type !== 'rtsp';
+  const isStreamSupported = true;
 
   return (
     <div ref={setNodeRef} style={style}>
