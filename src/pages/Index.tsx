@@ -4,7 +4,7 @@ import { Camera } from '@/types/camera';
 import { Header } from '@/components/Header';
 import { CameraGrid } from '@/components/CameraGrid';
 import { CameraDialog } from '@/components/CameraDialog';
-import { Video, Plus } from 'lucide-react';
+import { Video, Plus, PlayCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -24,6 +24,7 @@ const Index = () => {
     deleteCamera,
     reorderCameras,
     setGridColumns,
+    loadExamples,
   } = useCameras();
 
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -101,10 +102,16 @@ const Index = () => {
             <p className="text-muted-foreground mb-6 max-w-md">
               Add your first camera stream to start monitoring. Supports HTTP, HLS, MJPEG streams and more.
             </p>
-            <Button onClick={handleAddCamera}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Your First Camera
-            </Button>
+            <div className="flex flex-wrap gap-3 justify-center">
+              <Button onClick={handleAddCamera}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Your First Camera
+              </Button>
+              <Button variant="outline" onClick={loadExamples}>
+                <PlayCircle className="h-4 w-4 mr-2" />
+                Load Demo Streams
+              </Button>
+            </div>
           </div>
         )}
       </main>

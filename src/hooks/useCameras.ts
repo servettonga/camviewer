@@ -14,24 +14,24 @@ const exampleCameras: Camera[] = [
   },
   {
     id: 'example-2',
-    name: 'Sintel (Demo)',
-    url: 'https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8',
+    name: 'Apple HLS Test (Demo)',
+    url: 'https://devstreaming-cdn.apple.com/videos/streaming/examples/img_bipbop_adv_example_fmp4/master.m3u8',
     type: 'hls',
     enabled: true,
     order: 1,
   },
   {
     id: 'example-3',
-    name: 'Test Pattern (Demo)',
-    url: 'https://cph-p2p-msl.akamaized.net/hls/live/2000341/test/master.m3u8',
+    name: 'Elephants Dream (Demo)',
+    url: 'https://test-streams.mux.dev/pts_shift/master.m3u8',
     type: 'hls',
     enabled: true,
     order: 2,
   },
   {
     id: 'example-4',
-    name: 'Tears of Steel (Demo)',
-    url: 'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8',
+    name: 'Live Test Stream (Demo)',
+    url: 'https://cph-p2p-msl.akamaized.net/hls/live/2000341/test/master.m3u8',
     type: 'hls',
     enabled: true,
     order: 3,
@@ -125,6 +125,13 @@ export function useCameras() {
     }
   }, []);
 
+  const loadExamples = useCallback(() => {
+    setConfig(prev => ({
+      ...prev,
+      cameras: exampleCameras,
+    }));
+  }, []);
+
   const sortedCameras = [...config.cameras].sort((a, b) => a.order - b.order);
 
   return {
@@ -138,5 +145,6 @@ export function useCameras() {
     setGridColumns,
     exportConfig,
     importConfig,
+    loadExamples,
   };
 }
