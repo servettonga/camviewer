@@ -2,6 +2,8 @@
 
 A lightweight, offline-capable camera stream viewer for monitoring security cameras, traffic feeds, and other video streams directly in your browser.
 
+<img width="1445" height="519" alt="Screenshot 2025-12-04 at 23 53 26" src="https://github.com/user-attachments/assets/14816b4c-aad0-4c0e-958e-f624912f0cda" />
+
 ## Features
 
 - **Multiple Stream Types** - Supports HLS (.m3u8), HTTP video (MP4/WebM), and MJPEG streams
@@ -12,6 +14,9 @@ A lightweight, offline-capable camera stream viewer for monitoring security came
 - **Dark/Light/System Theme** - Choose your preferred appearance
 - **Offline Storage** - All configuration stored locally in IndexedDB
 - **No Backend Required** - Runs entirely in the browser, no server-side storage
+
+<img height="720" alt="Screenshot 2025-12-04 at 23 54 26" src="https://github.com/user-attachments/assets/502494e2-8014-4668-985c-e9d0a895c055" />
+
 
 ## Supported Stream Types
 
