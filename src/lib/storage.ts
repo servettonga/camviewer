@@ -42,7 +42,7 @@ export async function loadConfig(): Promise<AppConfig | null> {
 export async function migrateFromLocalStorage(): Promise<AppConfig | null> {
   const LEGACY_KEY = 'camview-config';
   const stored = localStorage.getItem(LEGACY_KEY);
-  
+
   if (stored) {
     try {
       const config = JSON.parse(stored) as AppConfig;

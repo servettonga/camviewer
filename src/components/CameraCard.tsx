@@ -90,14 +90,14 @@ export function CameraCard({ camera, onEdit, onDelete, onToggleExpand }: CameraC
         lowLatencyMode: true,
       });
       hlsRef.current = hls;
-      
+
       hls.loadSource(camera.url);
       hls.attachMedia(video);
-      
+
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
         video.play().catch(() => {});
       });
-      
+
       hls.on(Hls.Events.ERROR, (_, data) => {
         if (data.fatal) {
           setHasError(true);
@@ -168,7 +168,7 @@ export function CameraCard({ camera, onEdit, onDelete, onToggleExpand }: CameraC
               )}
             </div>
           )}
-          
+
           {/* Drag Handle */}
           <button
             {...attributes}

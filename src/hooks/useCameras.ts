@@ -46,12 +46,12 @@ export function useCameras() {
     async function init() {
       // Try to migrate from localStorage first
       let stored = await migrateFromLocalStorage();
-      
+
       // If no migration, try loading from IndexedDB
       if (!stored) {
         stored = await loadConfig();
       }
-      
+
       if (stored) {
         setConfig({ ...defaultConfig, ...stored });
       }
@@ -63,19 +63,19 @@ export function useCameras() {
   // Debounced save to IndexedDB on change
   useEffect(() => {
     if (!isLoaded) return;
-    
+
     // Clear existing timeout
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
     }
-    
+
     // Debounce saves by 500ms
     saveTimeoutRef.current = setTimeout(() => {
       saveConfig(config).catch(err => {
         console.error('Failed to save config:', err);
       });
     }, 500);
-    
+
     return () => {
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
@@ -98,7 +98,7 @@ export function useCameras() {
   const updateCamera = useCallback((id: string, updates: Partial<Camera>) => {
     setConfig(prev => ({
       ...prev,
-      cameras: prev.cameras.map(c => 
+      cameras: prev.cameras.map(c =>
         c.id === id ? { ...c, ...updates } : c
       ),
     }));
@@ -155,7 +155,7 @@ export function useCameras() {
   const toggleExpanded = useCallback((id: string) => {
     setConfig(prev => ({
       ...prev,
-      cameras: prev.cameras.map(c => 
+      cameras: prev.cameras.map(c =>
         c.id === id ? { ...c, expanded: !c.expanded } : c
       ),
     }));
