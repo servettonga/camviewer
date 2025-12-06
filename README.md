@@ -17,7 +17,6 @@ A lightweight, offline-capable camera stream viewer for monitoring security came
 
 <img height="720" alt="Screenshot 2025-12-04 at 23 54 26" src="https://github.com/user-attachments/assets/502494e2-8014-4668-985c-e9d0a895c055" />
 
-
 ## Supported Stream Types
 
 | Type  | Format      | Example URL                 |
@@ -35,7 +34,7 @@ Browsers cannot play RTSP streams directly. Use a media server to convert RTSP t
 1. Install go2rtc on your local network
 2. Add your RTSP streams to go2rtc config
 3. Use the HLS URL in CamViewer:
-   ```
+   ```txt
    http://[go2rtc-ip]:1984/api/stream.m3u8?src=[stream-name]
    ```
 
@@ -74,7 +73,7 @@ npm run preview
 ### Using Pre-built Image
 
 ```bash
-docker run -d -p 8080:80 your-registry/camviewer:latest
+docker run -d -p 8080:80 ghcr.io/servettonga/camviewer:latest
 ```
 
 Access at `http://localhost:8080`
