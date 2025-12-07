@@ -6,6 +6,7 @@ import { VitePWA } from "vite-plugin-pwa";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  base: process.env.GITHUB_ACTIONS ? "/camviewer/" : "/",
   server: {
     host: "::",
     port: 8080,
@@ -15,7 +16,7 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.ico", "pwa-192x192.png", "pwa-512x512.png"],
+      includeAssets: ["favicon.svg", "pwa-192x192.png", "pwa-512x512.png"],
       manifest: {
         name: "CamViewer - Camera Stream Viewer",
         short_name: "CamViewer",
@@ -24,7 +25,7 @@ export default defineConfig(({ mode }) => ({
         background_color: "#0f172a",
         display: "standalone",
         orientation: "any",
-        start_url: "/",
+        start_url: process.env.GITHUB_ACTIONS ? "/camviewer/" : "/",
         icons: [
           {
             src: "pwa-192x192.png",
