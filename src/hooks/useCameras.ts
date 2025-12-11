@@ -40,6 +40,7 @@ export function useCameras() {
   const [config, setConfig] = useState<AppConfig>(defaultConfig);
   const [isLoaded, setIsLoaded] = useState(false);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isSavingRef = useRef(false);
 
   // Load from IndexedDB on mount
   useEffect(() => {
@@ -58,6 +59,20 @@ export function useCameras() {
       setIsLoaded(true);
     }
     init();
+
+    // Listen for config changes from other components
+    const handleConfigChange = (e: Event) => {
+      const customEvent = e as CustomEvent<AppConfig>;
+      // Don't update if we're the one who triggered the save
+      if (customEvent.detail && !isSavingRef.current) {
+        setConfig({ ...defaultConfig, ...customEvent.detail });
+      }
+    };
+    window.addEventListener('camview-config-changed', handleConfigChange);
+
+    return () => {
+      window.removeEventListener('camview-config-changed', handleConfigChange);
+    };
   }, []);
 
   // Debounced save to IndexedDB on change
@@ -71,8 +86,14 @@ export function useCameras() {
 
     // Debounce saves by 500ms
     saveTimeoutRef.current = setTimeout(() => {
+      isSavingRef.current = true;
       saveConfig(config).catch(err => {
         console.error('Failed to save config:', err);
+      }).finally(() => {
+        // Reset flag after a short delay to allow event to propagate
+        setTimeout(() => {
+          isSavingRef.current = false;
+        }, 100);
       });
     }, 500);
 
@@ -119,8 +140,16 @@ export function useCameras() {
   }, []);
 
   const setGridColumns = useCallback((columns: number) => {
-    setConfig(prev => ({ ...prev, gridColumns: columns }));
-  }, []);
+    const newConfig = { ...config, gridColumns: columns };
+    setConfig(newConfig);
+    // Save immediately for grid changes
+    isSavingRef.current = true;
+    saveConfig(newConfig).finally(() => {
+      setTimeout(() => {
+        isSavingRef.current = false;
+      }, 100);
+    });
+  }, [config]);
 
   const exportConfig = useCallback(() => {
     return JSON.stringify(config, null, 2);

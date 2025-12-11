@@ -26,6 +26,8 @@ async function getDB() {
 export async function saveConfig(config: AppConfig): Promise<void> {
   const db = await getDB();
   await db.put(STORE_NAME, config, CONFIG_KEY);
+  // Notify other components about the change
+  window.dispatchEvent(new CustomEvent('camview-config-changed', { detail: config }));
 }
 
 export async function loadConfig(): Promise<AppConfig | null> {
