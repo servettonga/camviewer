@@ -34,6 +34,8 @@ const defaultConfig: AppConfig = {
   cameras: exampleCameras,
   gridColumns: 2,
   autoRefreshInterval: 30,
+  seamlessView: false,
+  showCameraNames: false,
 };
 
 export function useCameras() {
@@ -151,6 +153,30 @@ export function useCameras() {
     });
   }, [config]);
 
+  const setSeamlessView = useCallback((seamless: boolean) => {
+    const newConfig = { ...config, seamlessView: seamless };
+    setConfig(newConfig);
+    // Save immediately
+    isSavingRef.current = true;
+    saveConfig(newConfig).finally(() => {
+      setTimeout(() => {
+        isSavingRef.current = false;
+      }, 100);
+    });
+  }, [config]);
+
+  const setShowCameraNames = useCallback((show: boolean) => {
+    const newConfig = { ...config, showCameraNames: show };
+    setConfig(newConfig);
+    // Save immediately
+    isSavingRef.current = true;
+    saveConfig(newConfig).finally(() => {
+      setTimeout(() => {
+        isSavingRef.current = false;
+      }, 100);
+    });
+  }, [config]);
+
   const exportConfig = useCallback(() => {
     return JSON.stringify(config, null, 2);
   }, [config]);
@@ -195,12 +221,16 @@ export function useCameras() {
   return {
     cameras: sortedCameras,
     gridColumns: config.gridColumns,
+    seamlessView: config.seamlessView ?? false,
+    showCameraNames: config.showCameraNames ?? false,
     isLoaded,
     addCamera,
     updateCamera,
     deleteCamera,
     reorderCameras,
     setGridColumns,
+    setSeamlessView,
+    setShowCameraNames,
     toggleExpanded,
     exportConfig,
     importConfig,

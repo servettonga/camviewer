@@ -11,6 +11,8 @@ const Index = () => {
   const {
     cameras,
     gridColumns,
+    seamlessView,
+    showCameraNames,
     isLoaded,
     addCamera,
     updateCamera,
@@ -60,6 +62,8 @@ const Index = () => {
             <CameraGrid
               cameras={cameras}
               gridColumns={gridColumns}
+              seamlessView={seamlessView}
+              showCameraNames={showCameraNames}
               onReorder={reorderCameras}
               onEdit={handleEditCamera}
               onDelete={deleteCamera}

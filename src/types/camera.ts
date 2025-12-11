@@ -13,4 +13,6 @@ export interface AppConfig {
   gridColumns: number;
   autoRefreshInterval: number;
   rtspProxyUrl?: string; // e.g., http://192.168.1.100:1984
+  seamlessView?: boolean; // Remove gaps and rounded corners
+  showCameraNames?: boolean; // Keep camera names visible without hover
 }

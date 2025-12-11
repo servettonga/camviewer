@@ -19,6 +19,8 @@ import { CameraCard } from './CameraCard';
 interface CameraGridProps {
   cameras: Camera[];
   gridColumns: number;
+  seamlessView?: boolean;
+  showCameraNames?: boolean;
   onReorder: (cameras: Camera[]) => void;
   onEdit: (camera: Camera) => void;
   onDelete: (id: string) => void;
@@ -28,6 +30,8 @@ interface CameraGridProps {
 export function CameraGrid({
   cameras,
   gridColumns,
+  seamlessView = false,
+  showCameraNames = false,
   onReorder,
   onEdit,
   onDelete,
@@ -60,6 +64,8 @@ export function CameraGrid({
     4: 'grid-cols-2 lg:grid-cols-4',
   }[gridColumns] || 'grid-cols-2';
 
+  const gapClass = seamlessView ? 'gap-0' : 'gap-4';
+
   return (
     <DndContext
       sensors={sensors}
@@ -67,7 +73,7 @@ export function CameraGrid({
       onDragEnd={handleDragEnd}
     >
       <SortableContext items={cameras.map((c) => c.id)} strategy={rectSortingStrategy}>
-        <div className={`grid ${gridClass} gap-4`}>
+        <div className={`grid ${gridClass} ${gapClass}`}>
           {cameras.map((camera) => (
             <div
               key={camera.id}
@@ -75,6 +81,8 @@ export function CameraGrid({
             >
               <CameraCard
                 camera={camera}
+                seamlessView={seamlessView}
+                showCameraNames={showCameraNames}
                 onEdit={onEdit}
                 onDelete={onDelete}
                 onToggleExpand={onToggleExpand}

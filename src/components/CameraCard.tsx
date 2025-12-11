@@ -15,12 +15,14 @@ import {
 
 interface CameraCardProps {
   camera: Camera;
+  seamlessView?: boolean;
+  showCameraNames?: boolean;
   onEdit: (camera: Camera) => void;
   onDelete: (id: string) => void;
   onToggleExpand: (id: string) => void;
 }
 
-export function CameraCard({ camera, onEdit, onDelete, onToggleExpand }: CameraCardProps) {
+export function CameraCard({ camera, seamlessView = false, showCameraNames = false, onEdit, onDelete, onToggleExpand }: CameraCardProps) {
   const [isPlaying, setIsPlaying] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [key, setKey] = useState(0);
@@ -124,8 +126,13 @@ export function CameraCard({ camera, onEdit, onDelete, onToggleExpand }: CameraC
 
   return (
     <div ref={setNodeRef} style={style}>
-      <Card className="overflow-hidden border-border bg-card shadow-md hover:shadow-lg transition-shadow duration-300 group">
-        <div className="relative aspect-video bg-muted/30">
+      <Card className={`overflow-hidden border-border bg-card shadow-md hover:shadow-lg transition-shadow duration-300 group ${
+        seamlessView ? 'rounded-none border-0 shadow-none' : ''
+      }`}>
+        <div
+          className="relative aspect-video bg-muted/30 cursor-zoom-in"
+          onClick={handleFullscreen}
+        >
           {camera.enabled && isStreamSupported && !hasError ? (
             camera.type === 'mjpeg' ? (
               <img
@@ -174,23 +181,38 @@ export function CameraCard({ camera, onEdit, onDelete, onToggleExpand }: CameraC
             {...attributes}
             {...listeners}
             className="absolute top-2 left-2 p-1.5 bg-background/80 backdrop-blur-sm rounded-md cursor-grab active:cursor-grabbing hover:bg-background/90 transition-all opacity-0 group-hover:opacity-100"
+            onClick={(e) => e.stopPropagation()}
           >
             <GripVertical className="h-4 w-4 text-foreground" />
           </button>
 
-          {/* Controls Overlay */}
-          <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-background/95 via-background/60 to-transparent">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-foreground truncate max-w-[60%]">
+          {/* Camera Name - Always visible when setting is on */}
+          {showCameraNames && (
+            <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-background/95 via-background/60 to-transparent pointer-events-none">
+              <span className="text-sm font-medium text-foreground truncate block">
                 {camera.name}
               </span>
-              <div className="flex items-center gap-1">
+            </div>
+          )}
+
+          {/* Controls Overlay - Only on hover */}
+          <div
+            className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-background/95 via-background/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              {/* Name visible on hover when setting is off */}
+              <span className="text-sm font-medium text-foreground truncate max-w-[60%]">
+                {!showCameraNames && camera.name}
+              </span>
+              {/* Controls - always hover-only */}
+              <div className="flex items-center gap-1 ml-auto">
                 {camera.enabled && isStreamSupported && (
                   <>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="h-7 w-7"
                       onClick={handleTogglePlay}
                     >
                       {isPlaying ? (
@@ -202,7 +224,7 @@ export function CameraCard({ camera, onEdit, onDelete, onToggleExpand }: CameraC
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="h-7 w-7"
                       onClick={handleRefresh}
                     >
                       <RefreshCw className="h-3.5 w-3.5" />
@@ -210,7 +232,7 @@ export function CameraCard({ camera, onEdit, onDelete, onToggleExpand }: CameraC
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="h-7 w-7"
                       onClick={handleFullscreen}
                     >
                       <Maximize className="h-3.5 w-3.5" />
@@ -218,7 +240,7 @@ export function CameraCard({ camera, onEdit, onDelete, onToggleExpand }: CameraC
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="h-7 w-7"
                       onClick={() => onToggleExpand(camera.id)}
                       title={camera.expanded ? "Collapse to 1x1" : "Expand to 2x2"}
                     >
@@ -232,7 +254,7 @@ export function CameraCard({ camera, onEdit, onDelete, onToggleExpand }: CameraC
                 )}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Button variant="ghost" size="icon" className="h-7 w-7">
                       <Settings className="h-3.5 w-3.5" />
                     </Button>
                   </DropdownMenuTrigger>

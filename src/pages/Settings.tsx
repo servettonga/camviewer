@@ -21,7 +21,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ThemeContext, Theme } from "@/App";
 
 const Settings = () => {
-  const { cameras, gridColumns, setGridColumns, exportConfig, importConfig, resetAll } = useCameras();
+  const { cameras, gridColumns, seamlessView, showCameraNames, setGridColumns, setSeamlessView, setShowCameraNames, exportConfig, importConfig, resetAll } = useCameras();
   const { toast } = useToast();
   const { theme, setTheme } = useContext(ThemeContext);
   const [importText, setImportText] = useState("");
@@ -161,6 +161,32 @@ const Settings = () => {
                   <SelectItem value="4">4</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium">Seamless View</p>
+                <p className="text-sm text-muted-foreground">Remove gaps and rounded corners</p>
+              </div>
+              <Button
+                variant={seamlessView ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSeamlessView(!seamlessView)}
+              >
+                {seamlessView ? "On" : "Off"}
+              </Button>
+            </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium">Always Show Camera Names</p>
+                <p className="text-sm text-muted-foreground">Keep names visible without hover</p>
+              </div>
+              <Button
+                variant={showCameraNames ? "default" : "outline"}
+                size="sm"
+                onClick={() => setShowCameraNames(!showCameraNames)}
+              >
+                {showCameraNames ? "On" : "Off"}
+              </Button>
             </div>
           </CardContent>
         </Card>
