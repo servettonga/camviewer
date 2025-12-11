@@ -15,7 +15,7 @@ A lightweight, offline-capable camera stream viewer for monitoring security came
 - **Offline Storage** - All configuration stored locally in IndexedDB
 - **No Backend Required** - Runs entirely in the browser, no server-side storage
 
-<img height="720" alt="Screenshot 2025-12-04 at 23 54 26" src="https://github.com/user-attachments/assets/502494e2-8014-4668-985c-e9d0a895c055" />
+<img height="960" alt="Screenshot" src="https://github.com/user-attachments/assets/1b5947e7-b8ff-4882-bf24-831a94924658" />
 
 ## Supported Stream Types
 
