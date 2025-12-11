@@ -26,6 +26,7 @@ export function CameraCard({ camera, seamlessView = false, showCameraNames = fal
   const [isPlaying, setIsPlaying] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [key, setKey] = useState(0);
+  const [isViewportFullscreen, setIsViewportFullscreen] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
 
@@ -64,7 +65,13 @@ export function CameraCard({ camera, seamlessView = false, showCameraNames = fal
     setHasError(true);
   };
 
+  // Viewport fullscreen (click on video - fit to width)
   const handleFullscreen = () => {
+    setIsViewportFullscreen(!isViewportFullscreen);
+  };
+
+  // System fullscreen (maximize button - native fullscreen)
+  const handleSystemFullscreen = () => {
     const container = videoRef.current?.parentElement;
     if (container) {
       if (document.fullscreenElement) {
@@ -124,70 +131,79 @@ export function CameraCard({ camera, seamlessView = false, showCameraNames = fal
 
   const isStreamSupported = true;
 
+  // Shared video/image element
+  const mediaElement = camera.enabled && isStreamSupported && !hasError ? (
+    camera.type === 'mjpeg' ? (
+      <img
+        key={key}
+        src={camera.url}
+        alt={camera.name}
+        className={isViewportFullscreen ? 'w-full h-auto object-contain' : 'w-full h-full object-contain bg-black'}
+        onError={handleError}
+      />
+    ) : (
+      <video
+        key={key}
+        ref={videoRef}
+        className={isViewportFullscreen ? 'w-full h-auto object-contain bg-black' : 'w-full h-full object-contain bg-black'}
+        autoPlay
+        muted
+        playsInline
+        onError={handleError}
+      />
+    )
+  ) : (
+    <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-muted-foreground">
+      {hasError ? (
+        <>
+          <AlertCircle className="h-8 w-8" />
+          <span className="text-sm">Stream unavailable</span>
+        </>
+      ) : !isStreamSupported ? (
+        <>
+          <Video className="h-8 w-8" />
+          <span className="text-sm text-center px-4">
+            RTSP not supported directly - use HLS URL from go2rtc
+          </span>
+        </>
+      ) : (
+        <>
+          <Video className="h-8 w-8" />
+          <span className="text-sm">Camera disabled</span>
+        </>
+      )}
+    </div>
+  );
+
   return (
-    <div ref={setNodeRef} style={style}>
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={isViewportFullscreen ? 'fixed inset-0 z-50 flex items-center justify-center bg-black' : ''}
+    >
       <Card className={`overflow-hidden border-border bg-card shadow-md hover:shadow-lg transition-shadow duration-300 group ${
         seamlessView ? 'rounded-none border-0 shadow-none' : ''
-      }`}>
+      } ${isViewportFullscreen ? 'w-full h-full max-w-none max-h-none bg-transparent border-0 shadow-none' : ''}`}>
         <div
-          className="relative aspect-video bg-muted/30 cursor-zoom-in"
+          className={`relative bg-muted/30 ${isViewportFullscreen ? 'h-full w-full flex items-center justify-center cursor-zoom-out' : 'aspect-video cursor-zoom-in'}`}
           onClick={handleFullscreen}
         >
-          {camera.enabled && isStreamSupported && !hasError ? (
-            camera.type === 'mjpeg' ? (
-              <img
-                key={key}
-                src={camera.url}
-                alt={camera.name}
-                className="w-full h-full object-cover"
-                onError={handleError}
-              />
-            ) : (
-              <video
-                key={key}
-                ref={videoRef}
-                className="w-full h-full object-cover bg-black"
-                autoPlay
-                muted
-                playsInline
-                onError={handleError}
-              />
-            )
-          ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-muted-foreground">
-              {hasError ? (
-                <>
-                  <AlertCircle className="h-8 w-8" />
-                  <span className="text-sm">Stream unavailable</span>
-                </>
-              ) : !isStreamSupported ? (
-                <>
-                  <Video className="h-8 w-8" />
-                  <span className="text-sm text-center px-4">
-                    RTSP not supported directly - use HLS URL from go2rtc
-                  </span>
-                </>
-              ) : (
-                <>
-                  <Video className="h-8 w-8" />
-                  <span className="text-sm">Camera disabled</span>
-                </>
-              )}
-            </div>
+          {mediaElement}
+
+          {/* Drag Handle - only show in normal view */}
+          {!isViewportFullscreen && (
+            <button
+              {...attributes}
+              {...listeners}
+              className="absolute top-2 left-2 p-1.5 bg-background/80 backdrop-blur-sm rounded-md cursor-grab active:cursor-grabbing hover:bg-background/90 transition-all opacity-0 group-hover:opacity-100"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <GripVertical className="h-4 w-4 text-foreground" />
+            </button>
           )}
 
-          {/* Drag Handle */}
-          <button
-            {...attributes}
-            {...listeners}
-            className="absolute top-2 left-2 p-1.5 bg-background/80 backdrop-blur-sm rounded-md cursor-grab active:cursor-grabbing hover:bg-background/90 transition-all opacity-0 group-hover:opacity-100"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <GripVertical className="h-4 w-4 text-foreground" />
-          </button>
-
-          {/* Camera Name - Always visible when setting is on */}
-          {showCameraNames && (
+          {/* Camera Name - Always visible when setting is on - only in normal view */}
+          {!isViewportFullscreen && showCameraNames && (
             <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-background/95 via-background/60 to-transparent pointer-events-none">
               <span className="text-sm font-medium text-foreground truncate block">
                 {camera.name}
@@ -195,12 +211,13 @@ export function CameraCard({ camera, seamlessView = false, showCameraNames = fal
             </div>
           )}
 
-          {/* Controls Overlay - Only on hover */}
-          <div
-            className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-background/95 via-background/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between">
+          {/* Controls Overlay - Only on hover - only in normal view */}
+          {!isViewportFullscreen && (
+            <div
+              className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-background/95 via-background/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between">
               {/* Name visible on hover when setting is off */}
               <span className="text-sm font-medium text-foreground truncate max-w-[60%]">
                 {!showCameraNames && camera.name}
@@ -233,7 +250,7 @@ export function CameraCard({ camera, seamlessView = false, showCameraNames = fal
                       variant="ghost"
                       size="icon"
                       className="h-7 w-7"
-                      onClick={handleFullscreen}
+                      onClick={handleSystemFullscreen}
                     >
                       <Maximize className="h-3.5 w-3.5" />
                     </Button>
@@ -273,7 +290,8 @@ export function CameraCard({ camera, seamlessView = false, showCameraNames = fal
                 </DropdownMenu>
               </div>
             </div>
-          </div>
+            </div>
+          )}
         </div>
       </Card>
     </div>
